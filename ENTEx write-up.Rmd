@@ -1,0 +1,1665 @@
+---
+title: "New_combined_data"
+author: "Keyang Yu"
+date: "1/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r combinedMethylation for each individual}
+
+ENC001_all_autosome = ENC001_combined_new_clean[ENC001_combined_new_clean$chromosome <= 22,]
+ENC002_all_autosome = ENC002_combined_new_clean[ENC002_combined_new_clean$chromosome <= 22,]
+ENC003_all_autosome = ENC003_combined_new_clean[ENC003_combined_new_clean$chromosome <= 22,]
+ENC004_all_autosome = ENC004_combined_new_clean[ENC004_combined_new_clean$chromosome <= 22,]
+
+```
+
+```{r ANNOVAR clean up}
+### Annotate ref allele and alt allele
+# ENC001
+enc001_allvariants_sorted = enc001_allvariants_sorted[,c(1,2,4,5)]
+enc001_combined_test = merge(x = ENC001_all_autosome,y = enc001_allvariants_sorted, by.x = c("chromosome","end"), by.y = c("##CHROM","POS"))
+enc001_combined_test = enc001_combined_test[order(enc001_combined_test$chromosome,enc001_combined_test$start),]
+enc001_combined_annotation_prep = enc001_combined_test[,c(1,3,2,13,14)]
+enc001_combined_test = enc001_combined_test[,c(1,3,2,4,5,6,7,8,9,13,14,10,11,12)]
+write.table(enc001_combined_annotation_prep,"enc001_combined_annotation_prep.vcf", quote = FALSE, sep = "\t", row.names = F, col.names = F)
+#ENC002
+enc002_allvariants_sorted = enc002_allvariants_sorted[,c(1,2,4,5)]
+enc002_combined_test = merge(x = ENC002_all_autosome,y = enc002_allvariants_sorted, by.x = c("chromosome","end"), by.y = c("X1","X2"))
+enc002_combined_test = enc002_combined_test[order(enc002_combined_test$chromosome,enc002_combined_test$start),]
+enc002_combined_annotation_prep = enc002_combined_test[,c(1,3,2,13,14)]
+enc002_combined_test = enc002_combined_test[,c(1,3,2,4,5,6,7,8,9,13,14,10,11,12)]
+colnames(enc002_combined_annotation_prep) = c("chromosome","start","end","REF","ALT")
+write.table(enc002_combined_annotation_prep,"enc002_combined_annotation_prep.vcf", quote = FALSE, sep = "\t", row.names = F, col.names = F)
+
+
+#ENC003
+enc003_allvariants_sorted = enc003_allvariants_sorted[,c(1,2,4,5)]
+enc003_combined_test = merge(x = ENC003_all_autosome,y = enc003_allvariants_sorted, by.x = c("chromosome","end"), by.y = c("X1","X2"))
+enc003_combined_test = enc003_combined_test[order(enc003_combined_test$chromosome,enc003_combined_test$start),]
+enc003_combined_annotation_prep = enc003_combined_test[,c(1,3,2,13,14)]
+enc003_combined_test = enc003_combined_test[,c(1,3,2,4,5,6,7,8,9,13,14,10,11,12)]
+colnames(enc003_combined_annotation_prep) = c("chromosome","start","end","REF","ALT")
+write.table(enc003_combined_annotation_prep,"enc003_combined_annotation_prep.vcf", quote = FALSE, sep = "\t", row.names = F, col.names = F)
+
+#ENC004
+enc004_allvariants_sorted = enc004_allvariants_sorted[,c(1,2,4,5)]
+enc004_combined_test = merge(x = ENC004_all_autosome,y = enc004_allvariants_sorted, by.x = c("chromosome","end"), by.y = c("X1","X2"))
+enc004_combined_test = enc004_combined_test[order(enc004_combined_test$chromosome,enc004_combined_test$start),]
+enc004_combined_annotation_prep = enc004_combined_test[,c(1,3,2,13,14)]
+enc004_combined_test = enc004_combined_test[,c(1,3,2,4,5,6,7,8,9,13,14,10,11,12)]
+colnames(enc004_combined_annotation_prep) = c("chromosome","start","end","REF","ALT")
+write.table(enc004_combined_annotation_prep,"enc004_combined_annotation_prep.vcf", quote = FALSE, sep = "\t", row.names = F, col.names = F)
+```
+
+```{r annotation filter}
+en001_annotation_filtered = enc001_annotOut_hg38_multianno[,c(1,2,3,4,5,6,7,8,11,14,15,16)]
+en002_annotation_filtered = enc002_annotOut_hg38_multianno[,c(1,2,3,4,5,6,7,8,11,14,15,16)]
+en003_annotation_filtered = enc003_annotOut_hg38_multianno[,c(1,2,3,4,5,6,7,8,11,14,15,16)]
+en004_annotation_filtered = enc004_annotOut_hg38_multianno[,c(1,2,3,4,5,6,7,8,11,14,15,16)]
+
+colnames(en001_annotation_filtered) = c("chromosome","start","end","ref","alt","Func.refGene","Gene.refGene","Position.refGene","AlleleId.ClinVar","Criteria.ClinVar","Patho.ClinVar","AlleleFreq.gnomAD")
+```
+
+```{r merge ANNOVAR}
+enc001_autosome_annotated = merge(ENC001_all_autosome,en001_annotation_filtered,by=c("chromosome","end"),all = T)
+enc002_autosome_annotated = merge(ENC002_all_autosome,en002_annotation_filtered,by=c("chromosome","end"),all = T)
+enc003_autosome_annotated = merge(ENC003_all_autosome,en003_annotation_filtered,by=c("chromosome","end"),all = T)
+enc004_autosome_annotated = merge(ENC004_all_autosome,en004_annotation_filtered,by=c("chromosome","end"),all = T)
+
+enc001_autosome_annotated_filtered = enc001_autosome_annotated[,c(1,3,2,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22)]
+colnames(enc001_autosome_annotated_filtered)[2] <- "start"
+
+enc002_autosome_annotated_filtered = enc002_autosome_annotated[,c(1,3,2,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22)]
+colnames(enc002_autosome_annotated_filtered)[2] <- "start"
+
+enc003_autosome_annotated_filtered = enc003_autosome_annotated[,c(1,3,2,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22)]
+colnames(enc003_autosome_annotated_filtered)[2] <- "start"
+
+enc004_autosome_annotated_filtered = enc004_autosome_annotated[,c(1,3,2,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22)]
+colnames(enc004_autosome_annotated_filtered)[2] <- "start"
+
+enc002_autosome_annotated_filtered = enc002_autosome_annotated_filtered[order(as.integer(as.character(enc002_autosome_annotated_filtered$chromosome)),as.integer(as.character(enc002_autosome_annotated_filtered$start))),]
+
+enc003_autosome_annotated_filtered = enc003_autosome_annotated_filtered[order(as.integer(as.character(enc003_autosome_annotated_filtered$chromosome)),as.integer(as.character(enc003_autosome_annotated_filtered$start))),]
+
+enc004_autosome_annotated_filtered = enc004_autosome_annotated_filtered[order(as.integer(as.character(enc004_autosome_annotated_filtered$chromosome)),as.integer(as.character(enc004_autosome_annotated_filtered$start))),]
+
+enc001_autosome_annotated_filtered$AlleleFreq.gnomAD = as.numeric(as.character(enc001_autosome_annotated_filtered$AlleleFreq.gnomAD))
+
+enc001_autosome_annotated_filtered = enc001_autosome_annotated_filtered[!is.na(enc001_autosome_annotated_filtered$AlleleFreq.gnomAD),]
+
+
+
+```
+
+```{r cCRE}
+########################################################
+####Classification of cCREs
+########################################################
+#Many uses of cCREs are based on the regulatory role associated with their biochemical signatures. Thus, we putatively #defined cCREs in one of the following annotation groups based on each element’s dominant biochemical signals across all #available biosamples. Analogous to GENCODE's catalog of genes, which are defined irrespective of their varying #expression levels and alternative transcripts across different cell types, we provide a general, cell type-agnostic #classification of cCREs based on the max-Zs as well as its proximity to the nearest annotated TSS:
+#
+#-cCREs with promoter-like signatures (cCRE-PLS) fall within 200 bp (center to center) of an annotated GENCODE TSS and #have high DNase and H3K4me3 signals (evaluated as DNase and H3K4me3 max-Z scores, defined as the maximal DNase or #H3K4me3 Z scores across all biosamples with data; see Methods).
+#
+#-cCREs with enhancer-like signatures (cCRE-ELS) have high DNase and H3K27ac max-Z scores and must additionally have a #low H3K4me3 max-Z score if they are within 200 bp of an annotated TSS. The subset of cCREs-ELS within 2 kb of a TSS is #denoted proximal (cCRE-pELS), while the remaining subset is denoted distal (cCRE-dELS).
+#
+#DNase-H3K4me3 cCREs have high H3K4me3 max-Z scores but low H3K27ac max-Z scores and do not fall within 200 bp of a TSS.
+#
+#CTCF-only cCREs have high DNase and CTCF max-Z scores and low H3K4me3 and H3K27ac max-Z scores.
+#
+############################################################
+
+# Format cCRE
+colnames(enc001_hg38_bed_processed) = c("chromosome","start","end","ref","alt","reg_element","CTCF")
+enc001_hg38_bed_processed$CTCF[is.na(enc001_hg38_bed_processed$CTCF)] <- "."
+typeof(enc001_hg38_bed_processed$end)
+enc001_hg38_bed_processed$start <- enc001_hg38_bed_processed$start - 1
+
+# Combine with annovar annotated file
+enc001_annovar_cCRE = merge(x = enc001_autosome_annotated_filtered, y = enc001_hg38_bed_processed, by = c("chromosome","start","end"),all = T)
+
+# Format combined annovar annotation and cCRE annotation
+enc001_annovar_cCRE = enc001_annovar_cCRE[,c(1:21,24:25)]
+enc001_annovar_cCRE$reg_element[is.na(enc001_annovar_cCRE$reg_element)] <- "."
+enc001_annovar_cCRE$CTCF[is.na(enc001_annovar_cCRE$CTCF)] <- "."
+
+# Convert cCRE into factors
+#enc001_annovar_cCRE <- within(enc001_annovar_cCRE, {
+#  reg_element_f <- as.factor(reg_element)
+#})
+#enc001_annovar_cCRE <- within(enc001_annovar_cCRE, {
+#  CTCF_f <- as.factor(CTCF)
+#})
+
+# Format combined annotation file column names
+colnames(enc001_annovar_cCRE)[13] = "ref"
+colnames(enc001_annovar_cCRE)[14] = "alt"
+
+enc001_annovar_cCRE_final = enc001_annovar_cCRE[complete.cases(enc001_annovar_cCRE[,4:7]),]
+
+enc001_annovar_cCRE = enc001_annovar_cCRE_final
+
+```
+
+
+```{r import ASE/ASB/ATAC(repeat on enc002, enc003, and enc004)}
+
+
+# ASE
+ASE_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASE_ENC001_alltissues.tsv", 
+     "\t", escape_double = FALSE, col_names = FALSE, 
+     trim_ws = TRUE)
+
+colnames(ASE_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+# ATAC
+ATAC_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ATAC_ENC001_alltissues.tsv", 
+     "\t", escape_double = FALSE, col_names = FALSE, 
+     trim_ws = TRUE)
+colnames(ATAC_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+# ASB histone
+ASBhistone_H3K4me1_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBhistone_H3K4me1_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+
+colnames(ASBhistone_H3K4me1_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBhistone_H3K4me3_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBhistone_H3K4me3_ENC001_alltissues.tsv", 
+     "\t", escape_double = FALSE, col_names = FALSE, 
+     trim_ws = TRUE)
+
+colnames(ASBhistone_H3K4me3_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBhistone_H3K9me3_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBhistone_H3K9me3_ENC001_alltissues.tsv", 
+     "\t", escape_double = FALSE, col_names = FALSE, 
+     trim_ws = TRUE)
+
+colnames(ASBhistone_H3K9me3_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBhistone_H3K27ac_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBhistone_H3K27ac_ENC001_alltissues.tsv", 
+     "\t", escape_double = FALSE, col_names = FALSE, 
+     trim_ws = TRUE)
+
+colnames(ASBhistone_H3K27ac_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBhistone_H3K27me3_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBhistone_H3K27me3_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+
+colnames(ASBhistone_H3K27me3_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBhistone_H3K36me3_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBhistone_H3K36me3_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+
+colnames(ASBhistone_H3K36me3_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+# ASBtf
+ASBtf_CTCF_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBtf_CTCF_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+colnames(ASBtf_CTCF_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBtf_EP300_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBtf_EP300_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+colnames(ASBtf_EP300_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBtf_POLR2A_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBtf_POLR2A_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+colnames(ASBtf_POLR2A_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+ASBtf_POLR2ApS5_enc001_alltissues <- read_delim("C:/Users/yuk19/Downloads/ASBtf_POLR2ApS5_ENC001_alltissues.tsv", 
+    "\t", escape_double = FALSE, col_names = FALSE, 
+    trim_ws = TRUE)
+colnames(ASBtf_POLR2ApS5_enc001_alltissues) = c("chromosome","end","ref","hap1","hap2","ref_perc")
+
+```
+
+```{r merge (repeat on enc002, enc003, and enc004)}
+
+enc001_allmark = enc001_annovar_cCRE_final
+
+enc001_allmark = merge(enc001_allmark[,1:23],ASE_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASE_ref_perc"
+enc001_allmark$ASE_ref_perc[is.na(enc001_allmark$ASE_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ATAC_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ATAC_ref_perc"
+enc001_allmark$ATAC_ref_perc[is.na(enc001_allmark$ATAC_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBtf_CTCF_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBtf_CTCF_ref_perc"
+enc001_allmark$ASBtf_CTCF_ref_perc[is.na(enc001_allmark$ASBtf_CTCF_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBtf_EP300_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBtf_EP300_ref_perc"
+enc001_allmark$ASBtf_EP300_ref_perc[is.na(enc001_allmark$ASBtf_EP300_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBtf_POLR2A_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBtf_POLR2A_ref_perc"
+enc001_allmark$ASBtf_POLR2A_ref_perc[is.na(enc001_allmark$ASBtf_POLR2A_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBtf_POLR2ApS5_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBtf_POLR2ApS5_ref_perc"
+enc001_allmark$ASBtf_POLR2ApS5_ref_perc[is.na(enc001_allmark$ASBtf_POLR2ApS5_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBhistone_H3K27ac_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBh_H3K27ac_ref_perc"
+enc001_allmark$ASBh_H3K27ac_ref_perc[is.na(enc001_allmark$ASBh_H3K27ac_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBhistone_H3K27me3_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBh_H3K27me3_ref_perc"
+enc001_allmark$ASBh_H3K27me3_ref_perc[is.na(enc001_allmark$ASBh_H3K27me3_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBhistone_H3K36me3_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBh_H3K36me3_ref_perc"
+enc001_allmark$ASBh_H3K36me3_ref_perc[is.na(enc001_allmark$ASBh_H3K36me3_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBhistone_H3K4me1_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBh_H3K4me1_ref_perc"
+enc001_allmark$ASBh_H3K4me1_ref_perc[is.na(enc001_allmark$ASBh_H3K4me1_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBhistone_H3K4me3_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBh_H3K4me3_ref_perc"
+enc001_allmark$ASBh_H3K4me3_ref_perc[is.na(enc001_allmark$ASBh_H3K4me3_ref_perc)] = "."
+
+enc001_allmark = merge(enc001_allmark,ASBhistone_H3K9me3_enc001_alltissues[,c(1,2,6)],by=c("chromosome","end"),all.x = T)
+colnames(enc001_allmark)[length(colnames(enc001_allmark))] = "ASBh_H3K9me3_ref_perc"
+enc001_allmark$ASBh_H3K9me3_ref_perc[is.na(enc001_allmark$ASBh_H3K9me3_ref_perc)] = "."
+
+enc001_allmark = enc001_allmark[order(enc001_allmark$chromosome,enc001_allmark$end),]
+
+```
+
+```{r combined all marker to ENTEx_combined}
+
+ENTEx_combined = rbind(enc001_allmark,enc002_allmark,enc003_allmark,enc004_allmark)
+
+ENTEx_combined$ASE_ref_perc = as.numeric(as.character(ENTEx_combined$ASE_ref_perc))
+
+ENTEx_combined$ATAC_ref_perc = as.numeric(as.character(ENTEx_combined$ATAC_ref_perc))
+
+ENTEx_combined$ASBtf_CTCF_ref_perc = as.numeric(as.character(ENTEx_combined$ASBtf_CTCF_ref_perc))
+
+ENTEx_combined$ASBtf_EP300_ref_perc = as.numeric(as.character(ENTEx_combined$ASBtf_EP300_ref_perc))
+
+ENTEx_combined$ASBtf_POLR2A_ref_perc = as.numeric(as.character(ENTEx_combined$ASBtf_POLR2A_ref_perc))
+
+ENTEx_combined$ASBtf_POLR2ApS5_ref_perc = as.numeric(as.character(ENTEx_combined$ASBtf_POLR2ApS5_ref_perc))
+
+ENTEx_combined$ASBh_H3K27ac_ref_perc = as.numeric(as.character(ENTEx_combined$ASBh_H3K27ac_ref_perc))
+
+ENTEx_combined$ASBh_H3K27me3_ref_perc = as.numeric(as.character(ENTEx_combined$ASBh_H3K27me3_ref_perc))
+
+ENTEx_combined$ASBh_H3K36me3_ref_perc = as.numeric(as.character(ENTEx_combined$ASBh_H3K36me3_ref_perc))
+
+ENTEx_combined$ASBh_H3K4me1_ref_perc = as.numeric(as.character(ENTEx_combined$ASBh_H3K4me1_ref_perc))
+
+ENTEx_combined$ASBh_H3K4me3_ref_perc = as.numeric(as.character(ENTEx_combined$ASBh_H3K4me3_ref_perc))
+
+ENTEx_combined$ASBh_H3K9me3_ref_perc = as.numeric(as.character(ENTEx_combined$ASBh_H3K9me3_ref_perc))
+
+
+ENTEx_combined[is.na(ENTEx_combined)] <- 2
+
+ENTEx_combined$Gene.refGene1 = "."
+ENTEx_combined$Gene.refGene2 = "."
+ENTEx_combined$Position.refGene1 = "."
+ENTEx_combined$Position.refGene2 = "."
+
+
+library(tidyr)
+
+ENTEx_combined = separate(data = ENTEx_combined, col = Gene.refGene, into = c("refGene1","refGene2"),sep = ";",extra = "drop",fill = "right",remove = F)
+
+ENTEx_combined = separate(data = ENTEx_combined, col = Position.refGene, into = c("Position1","Position2"),sep = ";",extra = "drop",fill = "right",remove = F)
+
+
+ENTEx_combined$refGene2[is.na(ENTEx_combined$refGene2)] <- "."
+ENTEx_combined$Position2[is.na(ENTEx_combined$Position2)] <- "."
+
+
+# ENTEx_combined_tmp = ENTEx_combined
+
+#test = ENTEx_combined_backup[ENTEx_combined_backup$ASBtf_CTCF_ref_perc!=".",c(1,2,13,26,36,37)]
+#test_origin = test
+#test$ASBtf_CTCF_ref_perc = as.numeric(as.character(test$ASBtf_CTCF_ref_perc))
+#test$ASBtf_CTCF_ref_perc[test$ref == test$Allele2] = 1-test$ASBtf_CTCF_ref_perc[test$ref == test$Allele2]
+
+# Convert to allele1 %
+ENTEx_combined$ASBtf_CTCF_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBtf_CTCF_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASE_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASE_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ATAC_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ATAC_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBtf_EP300_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBtf_EP300_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBtf_POLR2A_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBtf_POLR2A_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBtf_POLR2ApS5_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBtf_POLR2ApS5_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBh_H3K27ac_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBh_H3K27ac_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBh_H3K27me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBh_H3K27me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBh_H3K36me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBh_H3K36me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBh_H3K4me1_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBh_H3K4me1_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBh_H3K4me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBh_H3K4me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined$ASBh_H3K9me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2] = 1-ENTEx_combined$ASBh_H3K9me3_ref_perc[ENTEx_combined$ref == ENTEx_combined$hetSNP_allele2]
+
+
+#test2 = ENTEx_combined[ENTEx_combined$ASBtf_CTCF_ref_perc!=2 & ENTEx_combined$ASBtf_CTCF_ref_perc!=-1,c(1,2,13,30,40,41)]
+
+
+```
+
+
+```{r Shift in allele frequency}
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+combined_prom_ASM = ENTEx_combined[ENTEx_combined$reg_element == "PLS" & ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1,]
+
+combined_nonreg_ASM = ENTEx_combined[ENTEx_combined$reg_element == "." & ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1 ,]
+
+combined_nonreg_ASM_2 = ENTEx_combined[ENTEx_combined$reg_element == "." & ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1 & ENTEx_combined$Func.refGene != "exonic",]
+
+combined_prom_ASM_noTF = ENTEx_combined[ENTEx_combined$reg_element == "PLS" & ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1 & (ENTEx_combined$ASBtf_CTCF_ref_perc==-1 | ENTEx_combined$ASBtf_CTCF_ref_perc==2) & (ENTEx_combined$ASBtf_EP300_ref_perc==-1 | ENTEx_combined$ASBtf_EP300_ref_perc==2) & (ENTEx_combined$ASBtf_POLR2A_ref_perc==-1 | ENTEx_combined$ASBtf_POLR2A_ref_perc==2) & (ENTEx_combined$ASBtf_POLR2ApS5_ref_perc==-1 | ENTEx_combined$ASBtf_POLR2ApS5_ref_perc==2),]
+
+combined_prom_ASM_oneTF = ENTEx_combined[ENTEx_combined$reg_element == "PLS" & ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1 & ((ENTEx_combined$ASBtf_CTCF_ref_perc>=0 & ENTEx_combined$ASBtf_CTCF_ref_perc<=1) | (ENTEx_combined$ASBtf_EP300_ref_perc>=0 & ENTEx_combined$ASBtf_EP300_ref_perc<=1) | (ENTEx_combined$ASBtf_POLR2A_ref_perc>=0 & ENTEx_combined$ASBtf_POLR2A_ref_perc<=1) | (ENTEx_combined$ASBtf_POLR2ApS5_ref_perc>=0 & ENTEx_combined$ASBtf_POLR2ApS5_ref_perc<=1)),]
+
+combined_prom_ASM_allTF = ENTEx_combined[ENTEx_combined$reg_element == "PLS" & ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1 & (ENTEx_combined$ASBtf_CTCF_ref_perc>=0 & ENTEx_combined$ASBtf_CTCF_ref_perc<=1) & (ENTEx_combined$ASBtf_EP300_ref_perc>=0 & ENTEx_combined$ASBtf_EP300_ref_perc<=1) & (ENTEx_combined$ASBtf_POLR2A_ref_perc>=0 & ENTEx_combined$ASBtf_POLR2A_ref_perc<=1) & (ENTEx_combined$ASBtf_POLR2ApS5_ref_perc>=0 & ENTEx_combined$ASBtf_POLR2ApS5_ref_perc<=1),]
+
+combined_noASM_noTF = ENTEx_combined[ENTEx_combined$FDR >0.1 & (ENTEx_combined$ASBtf_CTCF_ref_perc==-1 | ENTEx_combined$ASBtf_CTCF_ref_perc==2) & (ENTEx_combined$ASBtf_EP300_ref_perc==-1 | ENTEx_combined$ASBtf_EP300_ref_perc==2) & (ENTEx_combined$ASBtf_POLR2A_ref_perc==-1 | ENTEx_combined$ASBtf_POLR2A_ref_perc==2) & (ENTEx_combined$ASBtf_POLR2ApS5_ref_perc==-1 | ENTEx_combined$ASBtf_POLR2ApS5_ref_perc==2),]
+
+combined_ASM_oneTF = ENTEx_combined[ENTEx_combined$FDR <0.1 & abs(ENTEx_combined$meth_diff) > 0.1 & ((ENTEx_combined$ASBtf_CTCF_ref_perc>=0 & ENTEx_combined$ASBtf_CTCF_ref_perc<=1) | (ENTEx_combined$ASBtf_EP300_ref_perc>=0 & ENTEx_combined$ASBtf_EP300_ref_perc<=1) | (ENTEx_combined$ASBtf_POLR2A_ref_perc>=0 & ENTEx_combined$ASBtf_POLR2A_ref_perc<=1) | (ENTEx_combined$ASBtf_POLR2ApS5_ref_perc>=0 & ENTEx_combined$ASBtf_POLR2ApS5_ref_perc<=1)),]
+
+
+
+ks.test(combined_prom_ASM$AlleleFreq.gnomAD,combined_nonreg_ASM$AlleleFreq.gnomAD) # D = 0.039834, p-value = 1.427e-10
+
+ks.test(combined_prom_ASM$AlleleFreq.gnomAD,combined_nonreg_ASM_2$AlleleFreq.gnomAD) # D = 0.04005, p-value = 1.109e-10
+
+ks.test(combined_prom_ASM_noTF$AlleleFreq.gnomAD,combined_nonreg_ASM$AlleleFreq.gnomAD) # D = 0.032671, p-value = 2.692e-06
+
+ks.test(combined_prom_ASM_noTF$AlleleFreq.gnomAD,combined_nonreg_ASM_2$AlleleFreq.gnomAD) # D = 0.032888, p-value = 2.252e-06
+
+ks.test(combined_prom_ASM_CTCF$AlleleFreq.gnomAD,combined_nonreg_ASM$AlleleFreq.gnomAD) # D = 0.11453, p-value = 6.205e-10
+
+ks.test(combined_prom_ASM_oneTF$AlleleFreq.gnomAD,combined_nonreg_ASM$AlleleFreq.gnomAD) # D = 0.086629, p-value = 2.414e-07
+
+ks.test(combined_prom_ASM_oneTF$AlleleFreq.gnomAD,combined_nonreg_ASM_2$AlleleFreq.gnomAD) # D = 0.086866, p-value = 2.213e-07
+
+ks.test(combined_prom_ASM_allTF$AlleleFreq.gnomAD,combined_nonreg_ASM$AlleleFreq.gnomAD) # D = 0.26906, p-value = 0.03004
+
+ks.test(combined_noASM_noTF$AlleleFreq.gnomAD,combined_ASM_oneTF$AlleleFreq.gnomAD) # D = 0.039834, p-value = 1.427e-10
+
+
+
+# plot combined prom+/ASM+ vs non-reg/ASM+
+cdf1 <- ecdf(combined_prom_ASM$AlleleFreq.gnomAD) 
+cdf1_2 <- ecdf(combined_prom_ASM_noTF$AlleleFreq.gnomAD)
+cdf2 <- ecdf(combined_nonreg_ASM_2$AlleleFreq.gnomAD)
+cdf3 <- ecdf(combined_prom_ASM_CTCF$AlleleFreq.gnomAD)
+cdf4 <- ecdf(combined_prom_ASM_oneTF$AlleleFreq.gnomAD)
+cdf5 <- ecdf(combined_prom_ASM_allTF$AlleleFreq.gnomAD)
+
+
+minMax1_2 <- seq(min(combined_prom_ASM_noTF$AlleleFreq.gnomAD, combined_nonreg_ASM_2$AlleleFreq.gnomAD), max(combined_prom_ASM_noTF$AlleleFreq.gnomAD, combined_nonreg_ASM_2$AlleleFreq.gnomAD), length.out=length(combined_prom_ASM_noTF$AlleleFreq.gnomAD)+length(combined_nonreg_ASM_2$AlleleFreq.gnomAD)) 
+x4 <- minMax1_2[which( abs(cdf1_2(minMax1_2) - cdf2(minMax1_2)) == max(abs(cdf1_2(minMax1_2) - cdf2(minMax1_2))) )] 
+y8 <- cdf1_2(x4) 
+y9 <- cdf2(x4)
+
+minMax3 <- seq(min(combined_prom_ASM_oneTF$AlleleFreq.gnomAD, combined_nonreg_ASM_2$AlleleFreq.gnomAD), max(combined_prom_ASM_oneTF$AlleleFreq.gnomAD, combined_nonreg_ASM_2$AlleleFreq.gnomAD), length.out=length(combined_prom_ASM_oneTF$AlleleFreq.gnomAD)+length(combined_nonreg_ASM_2$AlleleFreq.gnomAD))
+x2 <- minMax3[which(abs(cdf4(minMax3) - cdf2(minMax3)) == max(abs(cdf4(minMax3) - cdf2(minMax3))) )] 
+y4 <- cdf2(x2) 
+y5 <- cdf4(x2)
+
+minMax4 <- seq(min(combined_prom_ASM_allTF$AlleleFreq.gnomAD, combined_nonreg_ASM_2$AlleleFreq.gnomAD), max(combined_prom_ASM_allTF$AlleleFreq.gnomAD, combined_nonreg_ASM_2$AlleleFreq.gnomAD), length.out=length(combined_prom_ASM_allTF$AlleleFreq.gnomAD)+length(combined_nonreg_ASM_2$AlleleFreq.gnomAD))
+x3 <- minMax4[which( abs(cdf5(minMax4) - cdf2(minMax4)) == max(abs(cdf5(minMax4) - cdf2(minMax4))) )] 
+y6 <- cdf2(x3) 
+y7 <- cdf5(x3)
+
+
+ggplot_prep = ENTEx_combined[,c(20,21,25:28,10,12,15)]
+
+ggplot_prep$category = "none"
+
+ggplot_prep$category[ggplot_prep$FDR > 0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc==-1 | ggplot_prep$ASBtf_CTCF_ref_perc==2) & (ggplot_prep$ASBtf_EP300_ref_perc==-1 | ggplot_prep$ASBtf_EP300_ref_perc==2) & (ggplot_prep$ASBtf_POLR2A_ref_perc==-1 | ggplot_prep$ASBtf_POLR2A_ref_perc==2) & (ggplot_prep$ASBtf_POLR2ApS5_ref_perc==-1 | ggplot_prep$ASBtf_POLR2ApS5_ref_perc==2))] = "ASM-/ASBtf-"
+
+ggplot_prep$category[ggplot_prep$FDR < 0.1 & abs(ggplot_prep$meth_diff) > 0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc>=0 & ggplot_prep$ASBtf_CTCF_ref_perc<=1) | (ggplot_prep$ASBtf_EP300_ref_perc>=0 & ggplot_prep$ASBtf_EP300_ref_perc<=1) | (ggplot_prep$ASBtf_POLR2A_ref_perc>=0 & ggplot_prep$ASBtf_POLR2A_ref_perc<=1) | (ggplot_prep$ASBtf_POLR2ApS5_ref_perc>=0 & ggplot_prep$ASBtf_POLR2ApS5_ref_perc<=1))] = "ASM+/ASBtf+"
+
+df = ggplot_prep[(ggplot_prep$category == "ASM+/ASBtf+") | (ggplot_prep$category == "ASM-/ASBtf-"),c(1,10)]
+
+colnames(df)[1] = "AF"
+
+#ggplot(df, aes(x=AF,color=category)) + 
+#  stat_ecdf(lwd=1.0)+
+#  xlab("Population allele frequency (gnomAD)") +
+#  ylab("Cumulative relative frequency")
+
+#ggplot(df, aes(x=AF,color=category)) + geom_density()+
+#  xlab("Population allele frequency (gnomAD)") +
+#  ylab("Density")
+
+ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR<0.1 & abs(ggplot_prep$meth_diff)>0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc==-1 | ggplot_prep$ASBtf_CTCF_ref_perc==2) & (ggplot_prep$ASBtf_EP300_ref_perc==-1 | ggplot_prep$ASBtf_EP300_ref_perc==2) & (ggplot_prep$ASBtf_POLR2A_ref_perc==-1 | ggplot_prep$ASBtf_POLR2A_ref_perc==2) & (ggplot_prep$ASBtf_POLR2ApS5_ref_perc==-1 | ggplot_prep$ASBtf_POLR2ApS5_ref_perc==2))] = "PLS/ASM+/ASBtf-"
+
+ggplot_prep$category[ggplot_prep$reg_element == "." & ggplot_prep$FDR<0.1 & abs(ggplot_prep$meth_diff)>0.1 & ggplot_prep$Func.refGene != "exonic"] = "NonReg/ASM+"
+
+ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR <0.1 & abs(ggplot_prep$meth_diff) > 0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc>=0 & ggplot_prep$ASBtf_CTCF_ref_perc<=1) | (ggplot_prep$ASBtf_EP300_ref_perc>=0 & ggplot_prep$ASBtf_EP300_ref_perc<=1) | (ggplot_prep$ASBtf_POLR2A_ref_perc>=0 & ggplot_prep$ASBtf_POLR2A_ref_perc<=1) | (ggplot_prep$ASBtf_POLR2ApS5_ref_perc>=0 & ggplot_prep$ASBtf_POLR2ApS5_ref_perc<=1))] = "PLS/ASM+/ASBtf+"
+
+#ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR <0.1 & abs(ggplot_prep$meth_diff) > 0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc>=0 & ggplot_prep$ASBtf_CTCF_ref_perc<=1) & (ggplot_prep$ASBtf_EP300_ref_perc>=0 & ggplot_prep$ASBtf_EP300_ref_perc<=1) & (ggplot_prep$ASBtf_POLR2A_ref_perc>=0 & ggplot_prep$ASBtf_POLR2A_ref_perc<=1) & (ggplot_prep$ASBtf_POLR2ApS5_ref_perc>=0 & ggplot_prep$ASBtf_POLR2ApS5_ref_perc<=1))] = "PLS/ASM+/allASBtf"
+#df = ggplot_prep[(ggplot_prep$category == "Prom+/ASM+") | (ggplot_prep$category == "NonReg/ASM+") | (ggplot_prep$category == "Prom+/ASM+/ASB_tfCTCF+") | (ggplot_prep$category == "Prom+/ASM+/oneASB_tf") | (ggplot_prep$category == "Prom+/ASM+/allASB_tf"),c(1,9)]
+
+df = ggplot_prep[(ggplot_prep$category == "PLS/ASM+/ASBtf-") | (ggplot_prep$category == "NonReg/ASM+") | (ggplot_prep$category == "PLS/ASM+/ASBtf+"),c(1,10)]
+
+#df$category <- factor(df$category, levels = c("NonReg/ASM+", "PLS/ASM+/ASBtf-", "PLS/ASM+/oneASBtf","PLS/ASM+/allASBtf"))
+df$category <- factor(df$category, levels = c("NonReg/ASM+", "PLS/ASM+/ASBtf-", "PLS/ASM+/ASBtf+"))
+
+colnames(df)[1] = "AF"
+
+
+#test = ggplot_prep[ggplot_prep$category == "NonReg/ASM+",] #422076
+#test_af = test[test$AlleleFreq.gnomAD < 0.01,] #23398
+
+#test = ggplot_prep[ggplot_prep$category == "PLS/ASM+/ASBtf-",] #6428
+#test_af = test[test$AlleleFreq.gnomAD < 0.01,] #418
+
+#test = ggplot_prep[ggplot_prep$category == "PLS/ASM+/ASBtf+",] #1064
+#test_af = test[test$AlleleFreq.gnomAD < 0.01,] #114
+
+
+# population allele frequency 0-1
+ggplot(df, aes(x=AF,color=category)) + 
+  stat_ecdf(lwd=1.0) +
+  scale_x_continuous(limits = c(0,1.0), expand = c(0, 0),breaks = seq(0,1.0,0.1)) + 
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.05)) +
+  ggtitle("Cumulative distribution of population allele frequency for promoter ASM variants") +
+  xlab("Population allele frequency (gnomAD)") +
+  ylab("Cumulative relative frequency") +
+  theme(text = element_text(size=11)) +
+  theme_bw() +
+  theme(legend.position = c(0.86, 0.16)) +
+  theme(legend.title = element_blank()) +
+  geom_segment(aes(x = x4[1], y = y8[1], xend = x4[1], yend = y9[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x4[1] , y= y8[1]), color="black", size=1) +
+  geom_point(aes(x = x4[1] , y= y9[1]), color="black", size=1) +
+  geom_segment(aes(x = x2[1], y = y4[1], xend = x2[1], yend = y5[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x2[1] , y= y4[1]), color="black", size=1) +
+  geom_point(aes(x = x2[1] , y= y5[1]), color="black", size=1) +
+#  geom_segment(aes(x = x3[1], y = y6[1], xend = x3[1], yend = y7[1]),linetype = "dotted", color = "black") +
+#  geom_point(aes(x = x3[1] , y= y6[1]), color="black", size=1) +
+#  geom_point(aes(x = x3[1] , y= y7[1]), color="black", size=1) +
+  coord_cartesian(xlim =c(0, 1.0), ylim = c(0, 1.0))
+
+combined_promvnoReg_ASM_ASB_PAF = ggplot(df, aes(x=AF,color=category)) + 
+  stat_ecdf(lwd=1.0) +
+  scale_x_continuous(limits = c(0,1.0), expand = c(0, 0),breaks = seq(0,1.0,0.1)) + 
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.05)) +
+  ggtitle("Cumulative distribution of population allele frequency for promoter ASM variants") +
+  xlab("Population allele frequency (gnomAD)") +
+  ylab("Cumulative relative frequency") +
+  theme(text = element_text(size=11)) +
+  theme_bw() +
+  theme(legend.position = "right") +
+  theme(legend.title = element_blank()) +
+  geom_segment(aes(x = x4[1], y = y8[1], xend = x4[1], yend = y9[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x4[1] , y= y8[1]), color="black", size=1) +
+  geom_point(aes(x = x4[1] , y= y9[1]), color="black", size=1) +
+  geom_segment(aes(x = x2[1], y = y4[1], xend = x2[1], yend = y5[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x2[1] , y= y4[1]), color="black", size=1) +
+  geom_point(aes(x = x2[1] , y= y5[1]), color="black", size=1) +
+#  geom_segment(aes(x = x3[1], y = y6[1], xend = x3[1], yend = y7[1]),linetype = "dotted", color = "black") +
+#  geom_point(aes(x = x3[1] , y= y6[1]), color="black", size=1) +
+#  geom_point(aes(x = x3[1] , y= y7[1]), color="black", size=1) +
+  coord_cartesian(xlim =c(0, 1.0), ylim = c(0, 1.0))
+
+
+ggsave(filename="combined_promvnoReg_ASM_ASB_PAF2.png", plot=combined_promvnoReg_ASM_ASB_PAF, device="png",dpi=1000)
+
+
+
+# population allele frequency 0-0.5
+ggplot(df, aes(x=AF,color=category)) + 
+  stat_ecdf(lwd=1.0) +
+  scale_x_continuous(limits = c(0,1.0), expand = c(0, 0),breaks = seq(0,1.0,0.1)) + 
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.1)) +
+  ggtitle("Cumulative distribution of population allele frequency for promoter ASM variants") +
+  xlab("Population allele frequency (gnomAD)") +
+  ylab("Cumulative relative frequency") +
+  theme(text = element_text(size=16)) +
+  theme_bw() +
+  theme(legend.position = "right") +
+  theme(legend.title = element_blank()) +
+  geom_segment(aes(x = x4[1], y = y8[1], xend = x4[1], yend = y9[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x4[1] , y= y8[1]), color="black", size=1) +
+  geom_point(aes(x = x4[1] , y= y9[1]), color="black", size=1) +
+  geom_segment(aes(x = x2[1], y = y4[1], xend = x2[1], yend = y5[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x2[1] , y= y4[1]), color="black", size=1) +
+  geom_point(aes(x = x2[1] , y= y5[1]), color="black", size=1) +
+#  geom_segment(aes(x = x3[1], y = y6[1], xend = x3[1], yend = y7[1]),linetype = "dotted", color = "black") +
+#  geom_point(aes(x = x3[1] , y= y6[1]), color="black", size=1) +
+#  geom_point(aes(x = x3[1] , y= y7[1]), color="black", size=1) +
+  coord_cartesian(xlim =c(0, 0.5), ylim = c(0, 1.0))
+
+ggplot(df, aes(x=AF,color=category))+ geom_density()
+ggplot(df, aes(x=AF,color=category))+ geom_density(position = "stack")
+ggplot(df, aes(x=AF,color=category))+ stat_density(geom = "line")
+
+ggplot(df, aes(x=AF,color=category))+ geom_histogram(binwidth=0.01,fill="white") +scale_y_log10
+ggplot(df, aes(x=AF,color=category))+ geom_histogram(binwidth=0.01,fill="white")
+
+
+
+combined_promvnoReg_ASM_ASB_MAF = ggplot(df, aes(x=AF,color=category)) + 
+  stat_ecdf(lwd=1.0) +
+  scale_x_continuous(limits = c(0,1.0), expand = c(0, 0),breaks = seq(0,1.0,0.1)) + 
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.1)) +
+  ggtitle("Cumulative distribution of population allele frequency for promoter ASM variants") +
+  xlab("Population allele frequency (gnomAD)") +
+  ylab("Cumulative relative frequency") +
+  theme_bw() +
+  theme(legend.position = "none") +
+  theme(legend.title = element_blank()) +
+  geom_segment(aes(x = x4[1], y = y8[1], xend = x4[1], yend = y9[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x4[1] , y= y8[1]), color="black", size=1) +
+  geom_point(aes(x = x4[1] , y= y9[1]), color="black", size=1) +
+  geom_segment(aes(x = x2[1], y = y4[1], xend = x2[1], yend = y5[1]),linetype = "dotted", color = "black") +
+  geom_point(aes(x = x2[1] , y= y4[1]), color="black", size=1) +
+  geom_point(aes(x = x2[1] , y= y5[1]), color="black", size=1) +
+#  geom_segment(aes(x = x3[1], y = y6[1], xend = x3[1], yend = y7[1]),linetype = "dotted", color = "black") +
+#  geom_point(aes(x = x3[1] , y= y6[1]), color="black", size=1) +
+#  geom_point(aes(x = x3[1] , y= y7[1]), color="black", size=1) +
+  coord_cartesian(xlim =c(0, 0.5), ylim = c(0, 1.0)) +
+#  theme(plot.margin=unit(c(0.1,0.1,0.1,0.1),"inch")) +
+  theme(text = element_text(size=16),plot.margin=unit(c(1,1,1,1),"inch"))
+  
+ggsave(filename="combined_promvnoReg_ASM_ASB_MAF3.png", plot=combined_promvnoReg_ASM_ASB_MAF, device="png",dpi=1000,width = 8, height = 8)
+
+
+# rare and Extremely rare variants
+ggplot(df, aes(x=AF)) + 
+  stat_ecdf(lwd=1.0,aes(color=category)) +
+  scale_x_continuous(limits = c(0,0.2), expand = c(0, 0),breaks = seq(0,0.2,0.05)) + 
+#  scale_y_continuous(limits = c(0,0.80),expand = c(0, 0),breaks = seq(0,0.80,0.05)) +
+  ggtitle("Cumulative distribution of population allele frequency for promoter ASM variants") +
+  xlab("Population allele frequency (gnomAD)") +
+  ylab("Cumulative relative frequency") +
+  theme(text = element_text(size=11)) +
+  theme_bw() +
+  theme(legend.position = "right") +
+  theme(legend.title = element_blank()) +
+  coord_cartesian(xlim =c(0, 0.2))
+
+
+
+```
+
+
+```{r Enrichment of ASE/pathogenic genes}
+
+### Enrichment of ASE genes
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+#BiocManager::install("EnsDb.Hsapiens.v86")
+
+library("EnsDb.Hsapiens.v86")
+
+#ensembl.genes_sample <- c("ENSG00000150676", "ENSG00000099308", "ENSG00000142676", "ENSG00000180776", "ENSG00000108848", "ENSG00000277370", "ENSG00000103811", "ENSG00000101473")
+#test <- ensembldb::select(EnsDb.Hsapiens.v86, keys= ensembl.genes_sample, keytype = "GENEID", columns = c("SYMBOL","GENEID"))
+
+
+all_ASE_genes$id = NA
+all_ASE_genes = separate(data = all_ASE_genes, col = "#region", into = c("#region","version"),sep = "[.]")
+gene_list <- ensembldb::select(EnsDb.Hsapiens.v86, keys= all_ASE_genes$"#region", keytype = "GENEID", columns = c("SYMBOL","GENEID"))
+gene_list = unique(gene_list) #9085
+
+group1_all_gene = unique(combined_nonreg_ASM$refGene1) #nonreg ASM 20030
+group1_ASE_gene = unique(intersect(combined_nonreg_ASM$refGene1,gene_list$SYMBOL)) #ASE 6371
+
+
+group2_all_gene = unique(combined_prom_ASM_noCTCF$refGene1) #Prom ASM noCTCF 4365
+group2_ASE_gene = unique(intersect(combined_prom_ASM_noCTCF$refGene1,gene_list$SYMBOL)) # 1835
+
+group2_2_all_gene = unique(combined_prom_ASM_noTF$refGene1) #Prom ASM noTF 4122
+group2_2_ASE_gene = unique(intersect(combined_prom_ASM_noTF$refGene1,gene_list$SYMBOL)) # 1721
+
+group3_all_gene = unique(combined_prom_ASM_oneTF$refGene1) #Prom ASM oneASBtf 761
+group3_ASE_gene = unique(intersect(combined_prom_ASM_oneTF$refGene1,gene_list$SYMBOL)) # 364
+
+group4_all_gene = unique(combined_prom_ASM_allTF$refGene1) #Prom ASM allASBtf 20
+group4_ASE_gene = unique(intersect(combined_prom_ASM_allTF$refGene1,gene_list$SYMBOL)) # 12
+
+
+library(fmsb)
+#chisq.test(nonreg/ASM+ vs prom+/ASM+/ASBtf-)
+tbl = matrix(as.numeric(c(6371,13659,1721,2401)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 9.058541e-35
+
+tbl = matrix(as.numeric(c(1721,2401,6371,13659)), ncol = 2, byrow = T)
+oddsratio(tbl)
+
+#chisq.test(nonreg/ASM+ vs prom+/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(6371,13659,364,397)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 2.652278e-20
+
+tbl = matrix(as.numeric(c(364,397,6371,13659)), ncol = 2, byrow = T)
+oddsratio(tbl)
+
+
+
+#chisq.test(nonreg/ASM+ vs prom+/ASM+/allASBtf)
+tbl = matrix(as.numeric(c(6371,13659,12,8)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.01369819
+
+#chisq.test(prom+/ASM+/oneASBtf vs prom+/ASM+/allASBtf)
+tbl = matrix(as.numeric(c(364,397,12,8)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.3962208
+
+#chisq.test(prom+/ASM+/ASBtf- vs prom+/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(1721,2401,364,397)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.002100437
+
+
+category = c("ab","ac","ad","bc")
+pvalue = c(2.855199e-142,2.652278e-20,0.01369819,0.00328416)
+data <- data.frame(category,pvalue)
+data$FDR = p.adjust(data$pvalue, method = "hochberg", n = 4)
+data$FDR2 = p.adjust(data$pvalue, method = "fdr", n = 4)
+
+
+
+#category = c(rep("nonReg/ASM+",2),rep("Prom+/ASM+/ASBtf-",2),rep("Prom+/ASM+/oneASBtf",2),rep("Prom+/ASM+/allASBtf",2))
+#condition = rep(c("ASE","noASE"),4)
+#value = c(6371,13659,1835,2530,364,397,12,8)
+#data <- data.frame(category,condition,value)
+#data$perc = c(6371/(6371+13659),13659/(6371+13659),1835/(1835+2530),2530/(2530+1835),364/(364+397),397/(397+364),12/(12+8),8/(12+8))
+#data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+
+
+
+# Figure
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(6371,1835,364,12)
+data <- data.frame(category,value)
+data$perc = c(6371/(6371+13659),1721/(1721+2401),364/(364+397),12/(12+8))
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+data$sd = c(0.0032950574,0.0074684994,0.0183968463,0.11)
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/ASBtf+")
+value = c(6371,1835,364)
+data <- data.frame(category,value)
+data$perc = c(6371/(6371+13659),1721/(1721+2401),364/(364+397))
+data$category <- factor(data$category, levels = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/ASBtf+"))
+data$sd = c(0.0032950574,0.007681197,0.0183968463)
+
+
+
+ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of ASE genes") +
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.1)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none")+
+  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2,
+                 position=position_dodge(.9),color = "black") 
+  
+
+ASE_enrichment = ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of ASE genes") +
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.1)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none")+
+  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2,
+                 position=position_dodge(.9),color = "black") 
+  
+
+ggsave(filename="ASE_enrichment.png", plot=ASE_enrichment, device="png",dpi=1000, width = 7, height = 7, units = "in")
+
+
+### Enrichment of pathogenic genes among ASE genes across catagories
+
+group1_ASE_gene = unique(intersect(combined_nonreg_ASM$refGene1,gene_list$SYMBOL)) #ASE 6371
+group1_ASE_pahto_gene = intersect(group1_ASE_gene,gencc_genes) # 829
+
+group2_ASE_gene = unique(intersect(combined_prom_ASM_noCTCF$refGene1,gene_list$SYMBOL)) # 1835
+group2_ASE_pahto_gene = intersect(group2_ASE_gene,gencc_genes) # 236
+
+
+group3_ASE_gene = unique(intersect(combined_prom_ASM_oneTF$refGene1,gene_list$SYMBOL)) # 364
+group3_ASE_patho_gene = intersect(group3_ASE_gene,gencc_genes) # 38
+
+group4_all_gene = unique(combined_prom_ASM_allTF$refGene1) #Prom ASM oneASBtf 20
+group4_ASE_patho_gene = intersect(group4_ASE_gene,gencc_genes) # 0
+
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(829,236,38,0)
+data <- data.frame(category,value)
+data$perc = c(829/6371,236/1835,38/364,0/20)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+
+
+ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45) +
+  ylab("Fraction of pathogenic genes in ASE genes") +
+  scale_y_continuous(limits = c(0,0.2),expand = c(0, 0),breaks = seq(0,0.2,0.05)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") 
+
+
+### Enrichment of pathogenic genes in all genes across catagories
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(829,236,38,0)
+data <- data.frame(category,value)
+data$perc = c(829/20030,236/4365,38/761,0/20)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+
+
+ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of pathogenic genes in ASE genes") +
+  scale_y_continuous(limits = c(0,0.1),expand = c(0, 0),breaks = seq(0,0.1,0.05)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") 
+
+
+  
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/ASBtf-)
+tbl = matrix(as.numeric(c(829,19201,236,4129)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.0002389813
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(829,19201,38,723)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.2867784
+
+
+```
+
+
+```{r eQTL v7}
+
+#library(readr)
+#eqtl_tissue_set_metasoft <- read_delim("C:/Users/yuk19/OneDrive - Baylor College of Medicine/research/ENTEx Allelic Imbalance (post-QE)/eQTL/eqtl_tissue_set.metasoft.txt", 
+#    "\t", escape_double = FALSE, trim_ws = TRUE)
+#eqtl_tissue_set_metasoft = eqtl_tissue_set_metasoft[,c(1,15)]
+
+library(tidyr)
+
+eqtl_tissue_set_metasoft = separate(data = eqtl_tissue_set_metasoft, col = RSID, into = c("chr","end","ref","alt","genes"),sep = "_")
+
+eqtl_tissue_set_metasoft = eqtl_tissue_set_metasoft[eqtl_tissue_set_metasoft$ref %in% c("A","T","C","G") & eqtl_tissue_set_metasoft$alt %in% c("A","T","C","G") & eqtl_tissue_set_metasoft$chr != "X" & eqtl_tissue_set_metasoft$chr != "Y",]
+
+eqtl_tissue_set_metasoft$chr = as.numeric(as.character(eqtl_tissue_set_metasoft$chr))
+
+
+eqtl_ENTEx_merge = merge(ENTEx_combined,eqtl_tissue_set_metasoft[,c(1:4,6)],by.x =c("chromosome","end","ref","alt"),by.y = c("chr","end","ref","alt"),all.x = T)
+
+eqtl_ENTEx_merge = eqtl_ENTEx_merge[!is.na(eqtl_ENTEx_merge$chromosome),]
+
+eqtl_ENTEx_merge$PVALUE_Q[is.na(eqtl_ENTEx_merge$PVALUE_Q)] = 2
+
+
+
+# New data sets
+combined_prom_ASM_eqtl = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "PLS" & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & eqtl_ENTEx_merge$PVALUE_Q < 0.05,]
+
+combined_nonreg_ASM_new = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "." & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & eqtl_ENTEx_merge$Func.refGene != "exonic",]
+
+combined_nonreg_ASM_eqtl = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "." & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & eqtl_ENTEx_merge$PVALUE_Q < 0.05,]
+
+combined_prom_ASM_noCTCF_eqtl = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "PLS" & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & (eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc==-1 | eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc==2)& eqtl_ENTEx_merge$PVALUE_Q < 0.05,]
+
+combined_prom_ASM_CTCF_eqtl = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "PLS" & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc<=1& eqtl_ENTEx_merge$PVALUE_Q < 0.05,]
+
+combined_prom_ASM_oneTF_eqtl = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "PLS" & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & ((eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc<=1) | (eqtl_ENTEx_merge$ASBtf_EP300_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_EP300_ref_perc<=1) | (eqtl_ENTEx_merge$ASBtf_POLR2A_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_POLR2A_ref_perc<=1) | (eqtl_ENTEx_merge$ASBtf_POLR2ApS5_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_POLR2ApS5_ref_perc<=1)) & eqtl_ENTEx_merge$PVALUE_Q < 0.05,]
+
+combined_prom_ASM_allTF_eqtl = eqtl_ENTEx_merge[eqtl_ENTEx_merge$reg_element == "PLS" & eqtl_ENTEx_merge$FDR <0.1 & abs(eqtl_ENTEx_merge$meth_diff) > 0.1 & (eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_CTCF_ref_perc<=1) & (eqtl_ENTEx_merge$ASBtf_EP300_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_EP300_ref_perc<=1) & (eqtl_ENTEx_merge$ASBtf_POLR2A_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_POLR2A_ref_perc<=1) & (eqtl_ENTEx_merge$ASBtf_POLR2ApS5_ref_perc>=0 & eqtl_ENTEx_merge$ASBtf_POLR2ApS5_ref_perc<=1) & eqtl_ENTEx_merge$PVALUE_Q < 0.05,]
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/ASBtf-)
+tbl = matrix(as.numeric(c(2031,422677,186,6822)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 4.876841e-140
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(2031,422677,20,1044)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 1.857607e-10
+
+#chisq.test(Prom/ASM+/ASBtf- vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(186,6822,20,1044)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.1650771
+
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(2031,186,20,0)
+data <- data.frame(category,value)
+data$perc = c(2031/424708,186/7008,20/1064,0/29)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+data$sd = c(0.0001059552,0.001920091,0.004163534,0)
+
+
+ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of eQTL ") +
+  scale_y_continuous(limits = c(0,0.05),expand = c(0, 0),breaks = seq(0,0.05,0.01)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") +
+  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2,
+                 position=position_dodge(.9),color = "black") 
+
+
+
+# save figure
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(2031,186,20,0)
+data <- data.frame(category,value)
+data$perc = c(2031/424708,186/7008,20/1064,0/29)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+data$sd = c(0.0001059552,0.001920091,0.004163534,0)
+
+
+eqtl_enrichment = ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of eQTL ") +
+  scale_y_continuous(limits = c(0,0.05),expand = c(0, 0),breaks = seq(0,0.05,0.01)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") +
+  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2,
+                 position=position_dodge(.9),color = "black") 
+
+ggsave(filename="eqtl_enrichment.png", plot=eqtl_enrichment, device="png",dpi=1000, width = 7, height = 7, units = "in")
+
+
+# error: 45/424708 = 0.0001059552, 13.456/7008 = 0.001920091, 4.43/1064 = 0.004163534
+
+```
+
+```{r eQTL v8}
+library(tidyr)
+
+
+#eQTL_v8 = eQTL_v8[eQTL_v8$PVALUE_Q<0.05,]
+eQTL_v8 = separate(data = eQTL_v8, col = RSID, into = c("chr","end","ref","alt","genes"),sep = "_")
+
+eQTL_v8$chr = gsub("chr","",eQTL_v8$chr)
+
+eQTL_v8 = eQTL_v8[eQTL_v8$ref %in% c("A","T","C","G") & eQTL_v8$alt %in% c("A","T","C","G") & eQTL_v8$chr != "X" & eQTL_v8$chr != "Y",]
+
+eQTL_v8$chr = as.numeric(as.character(eQTL_v8$chr))
+eQTL_v8$end = as.numeric(as.character(eQTL_v8$end))
+
+eQTL_v8 = eQTL_v8[,1:4]
+eQTL_v8 = unique(eQTL_v8)
+eQTL_v8$GTEx = "eQTL"
+
+eqtl_ENTEx_merge2 = merge(ENTEx_combined,eQTL_v8,by.x =c("chromosome","end","ref","alt"),by.y = c("chr","end","ref","alt"),all.x = T)
+
+eqtl_ENTEx_merge2 = eqtl_ENTEx_merge2[!is.na(eqtl_ENTEx_merge2$chromosome),]
+
+eqtl_ENTEx_merge2$GTEx[is.na(eqtl_ENTEx_merge2$GTEx)] = "."
+
+eqtl_ENTEx_merge2 = unique(eqtl_ENTEx_merge2)
+
+
+# Frequency distribution
+#hist(combined_nonreg_ASM_eqtl2$AlleleFreq.gnomAD,breaks=20)
+plot(sort(combined_nonreg_ASM_eqtl2$AlleleFreq.gnomAD), 1:length(combined_nonreg_ASM_eqtl2$AlleleFreq.gnomAD))
+
+par(new=TRUE)
+#hist(combined_prom_ASM_noCTCF_eqtl2$AlleleFreq.gnomAD,breaks=20)
+plot(sort(combined_prom_ASM_noCTCF_eqtl2$AlleleFreq.gnomAD), 1:length(combined_prom_ASM_noCTCF_eqtl2$AlleleFreq.gnomAD))
+par(new=TRUE)
+#hist(combined_prom_ASM_oneTF_eqtl2$AlleleFreq.gnomAD,breaks=20)
+plot(sort(combined_prom_ASM_oneTF_eqtl2$AlleleFreq.gnomAD), 1:length(combined_prom_ASM_oneTF_eqtl2$AlleleFreq.gnomAD))
+par(new=TRUE)
+#hist(combined_prom_ASM_allTF_eqtl2$AlleleFreq.gnomAD,breaks=20)
+plot(sort(combined_prom_ASM_allTF_eqtl2$AlleleFreq.gnomAD), 1:length(combined_prom_ASM_allTF_eqtl2$AlleleFreq.gnomAD))
+
+
+# Better figure
+ggplot_prep = eqtl_ENTEx_merge2[,c(21,12,14,25,26,27,28,42)]
+
+ggplot_prep$category = "none"
+
+ggplot_prep$category[ggplot_prep$reg_element == "." & ggplot_prep$FDR <0.1 & abs(ggplot_prep$meth_diff) > 0.1 & ggplot_prep$GTEx != "."] = "nonreg_ASM_eqtl2"
+
+#ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR <0.1 & abs(ggplot_prep$meth_diff) > 0.1 & (ggplot_prep$ASBtf_CTCF_ref_perc==-1 | ggplot_prep$ASBtf_CTCF_ref_perc==2)& ggplot_prep$GTEx != "."] = "prom_ASM_noCTCF_eqtl"
+
+ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR<0.1 & abs(ggplot_prep$meth_diff)>0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc==-1 | ggplot_prep$ASBtf_CTCF_ref_perc==2) & (ggplot_prep$ASBtf_EP300_ref_perc==-1 | ggplot_prep$ASBtf_EP300_ref_perc==2) & (ggplot_prep$ASBtf_POLR2A_ref_perc==-1 | ggplot_prep$ASBtf_POLR2A_ref_perc==2) & (ggplot_prep$ASBtf_POLR2ApS5_ref_perc==-1 | ggplot_prep$ASBtf_POLR2ApS5_ref_perc==2)) & ggplot_prep$GTEx != "."] = "prom_ASM_noTF_eqtl"
+
+ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR <0.1 & abs(ggplot_prep$meth_diff) > 0.1 & ((ggplot_prep$ASBtf_CTCF_ref_perc>=0 & ggplot_prep$ASBtf_CTCF_ref_perc<=1) | (ggplot_prep$ASBtf_EP300_ref_perc>=0 & ggplot_prep$ASBtf_EP300_ref_perc<=1) | (ggplot_prep$ASBtf_POLR2A_ref_perc>=0 & ggplot_prep$ASBtf_POLR2A_ref_perc<=1) | (ggplot_prep$ASBtf_POLR2ApS5_ref_perc>=0 & ggplot_prep$ASBtf_POLR2ApS5_ref_perc<=1)) & ggplot_prep$GTEx != "."] = "prom_ASM_oneTF_eqtl"
+
+#ggplot_prep$category[ggplot_prep$reg_element == "PLS" & ggplot_prep$FDR <0.1 & abs(ggplot_prep$meth_diff) > 0.1 & (ggplot_prep$ASBtf_CTCF_ref_perc>=0 & ggplot_prep$ASBtf_CTCF_ref_perc<=1) & (ggplot_prep$ASBtf_EP300_ref_perc>=0 & ggplot_prep$ASBtf_EP300_ref_perc<=1) & (ggplot_prep$ASBtf_POLR2A_ref_perc>=0 & ggplot_prep$ASBtf_POLR2A_ref_perc<=1) & (ggplot_prep$ASBtf_POLR2ApS5_ref_perc>=0 & ggplot_prep$ASBtf_POLR2ApS5_ref_perc<=1) & ggplot_prep$GTEx != "."] = "prom_ASM_allTF_eqtl"
+
+
+
+#df = ggplot_prep[(ggplot_prep$category == "Prom+/ASM+") | (ggplot_prep$category == "NonReg/ASM+") | (ggplot_prep$category == "Prom+/ASM+/ASB_tfCTCF+") | (ggplot_prep$category == "Prom+/ASM+/oneASB_tf") | (ggplot_prep$category == "Prom+/ASM+/allASB_tf"),c(1,9)]
+
+#df = ggplot_prep[(ggplot_prep$category == "nonreg_ASM_eqtl2") | (ggplot_prep$category == "prom_ASM_noCTCF_eqtl") | (ggplot_prep$category == "prom_ASM_oneTF_eqtl") | (ggplot_prep$category == "prom_ASM_allTF_eqtl"),c(1,10)]
+
+df = ggplot_prep[(ggplot_prep$category == "nonreg_ASM_eqtl2") | (ggplot_prep$category == "prom_ASM_noCTCF_eqtl") | (ggplot_prep$category == "prom_ASM_oneTF_eqtl") | (ggplot_prep$category == "prom_ASM_allTF_eqtl"),c(1,9)]
+
+
+df$category <- factor(df$category, levels = c("nonreg_ASM_eqtl2", "prom_ASM_noTF_eqtl", "prom_ASM_oneTF_eqtl"))
+
+colnames(df)[1] = "AF"
+
+
+# population allele frequency 0-1
+ggplot(df, aes(x=AF,color=category)) + 
+  stat_ecdf(lwd=1.0) +
+  scale_x_continuous(limits = c(0,1.0), expand = c(0, 0),breaks = seq(0,1.0,0.1)) + 
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.05)) +
+  ggtitle("Cumulative distribution of population allele frequency for promoter AI eQTL") +
+  xlab("Population allele frequency (gnomAD)") +
+  ylab("Cumulative relative frequency") +
+  theme(text = element_text(size=11)) +
+  theme_bw() +
+  theme(legend.position = c(0.86, 0.16)) +
+  theme(legend.title = element_blank())
+
+
+
+
+# New data sets
+combined_nonreg_ASM_eqtl2 = eqtl_ENTEx_merge2[eqtl_ENTEx_merge2$reg_element == "." & eqtl_ENTEx_merge2$FDR <0.1 & abs(eqtl_ENTEx_merge2$meth_diff) > 0.1 & eqtl_ENTEx_merge2$GTEx != ".",]
+       
+combined_prom_ASM_noCTCF_eqtl2 = eqtl_ENTEx_merge2[eqtl_ENTEx_merge2$reg_element == "PLS" & eqtl_ENTEx_merge2$FDR <0.1 & abs(eqtl_ENTEx_merge2$meth_diff) > 0.1 & (eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc==-1 | eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc==2)& eqtl_ENTEx_merge2$GTEx != ".",]
+
+combined_prom_ASM_oneTF_eqtl2 = eqtl_ENTEx_merge2[eqtl_ENTEx_merge2$reg_element == "PLS" & eqtl_ENTEx_merge2$FDR <0.1 & abs(eqtl_ENTEx_merge2$meth_diff) > 0.1 & ((eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc<=1) | (eqtl_ENTEx_merge2$ASBtf_EP300_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_EP300_ref_perc<=1) | (eqtl_ENTEx_merge2$ASBtf_POLR2A_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_POLR2A_ref_perc<=1) | (eqtl_ENTEx_merge2$ASBtf_POLR2ApS5_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_POLR2ApS5_ref_perc<=1)) & eqtl_ENTEx_merge2$GTEx != ".",]
+
+combined_prom_ASM_noTF_eqtl2 = eqtl_ENTEx_merge2[eqtl_ENTEx_merge2$reg_element == "PLS" & eqtl_ENTEx_merge2$FDR <0.1 & abs(eqtl_ENTEx_merge2$meth_diff) > 0.1 & (eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc==-1 | eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc==2) & (eqtl_ENTEx_merge2$ASBtf_EP300_ref_perc==-1 | eqtl_ENTEx_merge2$ASBtf_EP300_ref_perc==2) & (eqtl_ENTEx_merge2$ASBtf_POLR2A_ref_perc==-1 | eqtl_ENTEx_merge2$ASBtf_POLR2A_ref_perc==2) & (eqtl_ENTEx_merge2$ASBtf_POLR2ApS5_ref_perc==-1 | eqtl_ENTEx_merge2$ASBtf_POLR2ApS5_ref_perc==2) & eqtl_ENTEx_merge2$GTEx != ".",]
+
+
+combined_prom_ASM_allTF_eqtl2 = eqtl_ENTEx_merge2[eqtl_ENTEx_merge2$reg_element == "PLS" & eqtl_ENTEx_merge2$FDR <0.1 & abs(eqtl_ENTEx_merge2$meth_diff) > 0.1 & (eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_CTCF_ref_perc<=1) & (eqtl_ENTEx_merge2$ASBtf_EP300_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_EP300_ref_perc<=1) & (eqtl_ENTEx_merge2$ASBtf_POLR2A_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_POLR2A_ref_perc<=1) & (eqtl_ENTEx_merge2$ASBtf_POLR2ApS5_ref_perc>=0 & eqtl_ENTEx_merge2$ASBtf_POLR2ApS5_ref_perc<=1) & eqtl_ENTEx_merge2$GTEx != ".",]
+
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/ASBtf-)
+tbl = matrix(as.numeric(c(177039,247669,4868,1560)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p-value < 2.2e-16
+
+tbl = matrix(as.numeric(c(4868,1560,177039,247669)), ncol = 2, byrow = T)
+oddsratio(tbl)
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(177039,247669,658,406)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p =  2.798533e-40
+
+tbl = matrix(as.numeric(c(658,406,177039,247669)), ncol = 2, byrow = T)
+oddsratio(tbl)
+
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/allASBtf)
+tbl = matrix(as.numeric(c(177039,247669,7,22)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.08395781
+
+#chisq.test(Prom/ASM+/ASBtf- vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(4868,1560,658,406)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 2.079584e-21
+
+
+data$sd = c(0.0001064643,0.0053471674,0.004243295,0)
+
+
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(177039,4868,658,7)
+data <- data.frame(category,value)
+data$perc = c(177039/424708,4868/6428,658/1064,7/29)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+data$sd = c(0.0001064643,0.001978892,0.004243295,0)
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf")
+value = c(177039,186,20)
+data <- data.frame(category,value)
+data$perc = c(177039/424708,4868/6428,658/1064)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf"))
+data$sd = c(0.001,0.0053471674,0.004243295)
+#0.0007389044992
+
+ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of eQTL ") +
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.1)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") +
+  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2, position=position_dodge(.9),color = "black") 
+
+
+# save figure
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(177039,5278,658,7)
+data <- data.frame(category,value)
+data$perc = c(177039/424708,5278/7008,658/1064,7/29)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+data$sd = c(0.0007565197736,0.0051512557,0.015037594,0.0793103448)
+
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf")
+value = c(177039,5278,658)
+data <- data.frame(category,value)
+data$perc = c(177039/424708,5278/7008,658/1064)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf"))
+data$sd = c(0.0007565197736,0.0051512557,0.015037594)
+
+eqtl_enrichment = ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of eQTL ") +
+  scale_y_continuous(limits = c(0,1.0),expand = c(0, 0),breaks = seq(0,1.0,0.1)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") +
+  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2, position=position_dodge(.9),color = "black") 
+
+ggsave(filename="eqtl_enrichment_v8_NOcutoff.png", plot=eqtl_enrichment, device="png",dpi=1000, width = 7, height = 7, units = "in")
+
+
+
+
+```
+
+
+```{r v7 remove repeats}
+
+eqtl_tissue_set_metasoft = eqtl_tissue_set_metasoft[eqtl_tissue_set_metasoft$PVALUE_Q<0.05,1:4]
+
+eqtl_tissue_set_metasoft = unique(eqtl_tissue_set_metasoft)
+
+eqtl_tissue_set_metasoft$GTEx = "eQTL"
+
+eqtl_ENTEx_merge1_2 = merge(ENTEx_combined,eqtl_tissue_set_metasoft,by.x =c("chromosome","end","ref","alt"),by.y = c("chr","end","ref","alt"),all.x = T)
+
+eqtl_ENTEx_merge1_2 = eqtl_ENTEx_merge1_2[!is.na(eqtl_ENTEx_merge1_2$chromosome),]
+
+eqtl_ENTEx_merge1_2$GTEx[is.na(eqtl_ENTEx_merge1_2$GTEx)] = "."
+
+# Histogram
+hist(combined_nonreg_ASM_eqtl$AlleleFreq.gnomAD,breaks=20)
+hist(combined_prom_ASM_noCTCF_eqtl$AlleleFreq.gnomAD,breaks=20)
+hist(combined_prom_ASM_oneTF_eqtl$AlleleFreq.gnomAD,breaks=20)
+hist(combined_prom_ASM_allTF_eqtl$AlleleFreq.gnomAD,breaks=20)
+
+
+
+# New data sets
+
+combined_nonreg_ASM_eqtl = eqtl_ENTEx_merge1_2[eqtl_ENTEx_merge1_2$reg_element == "." & eqtl_ENTEx_merge1_2$FDR <0.1 & abs(eqtl_ENTEx_merge1_2$meth_diff) > 0.1 & eqtl_ENTEx_merge1_2$GTEx != ".",]
+
+combined_prom_ASM_noCTCF_eqtl = eqtl_ENTEx_merge1_2[eqtl_ENTEx_merge1_2$reg_element == "PLS" & eqtl_ENTEx_merge1_2$FDR <0.1 & abs(eqtl_ENTEx_merge1_2$meth_diff) > 0.1 & (eqtl_ENTEx_merge1_2$ASBtf_CTCF_ref_perc==-1 | eqtl_ENTEx_merge1_2$ASBtf_CTCF_ref_perc==2)& eqtl_ENTEx_merge1_2$GTEx != ".",]
+
+combined_prom_ASM_oneTF_eqtl = eqtl_ENTEx_merge1_2[eqtl_ENTEx_merge1_2$reg_element == "PLS" & eqtl_ENTEx_merge1_2$FDR <0.1 & abs(eqtl_ENTEx_merge1_2$meth_diff) > 0.1 & ((eqtl_ENTEx_merge1_2$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_CTCF_ref_perc<=1) | (eqtl_ENTEx_merge1_2$ASBtf_EP300_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_EP300_ref_perc<=1) | (eqtl_ENTEx_merge1_2$ASBtf_POLR2A_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_POLR2A_ref_perc<=1) | (eqtl_ENTEx_merge1_2$ASBtf_POLR2ApS5_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_POLR2ApS5_ref_perc<=1)) & eqtl_ENTEx_merge1_2$GTEx != ".",]
+
+combined_prom_ASM_allTF_eqtl = eqtl_ENTEx_merge1_2[eqtl_ENTEx_merge1_2$reg_element == "PLS" & eqtl_ENTEx_merge1_2$FDR <0.1 & abs(eqtl_ENTEx_merge1_2$meth_diff) > 0.1 & (eqtl_ENTEx_merge1_2$ASBtf_CTCF_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_CTCF_ref_perc<=1) & (eqtl_ENTEx_merge1_2$ASBtf_EP300_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_EP300_ref_perc<=1) & (eqtl_ENTEx_merge1_2$ASBtf_POLR2A_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_POLR2A_ref_perc<=1) & (eqtl_ENTEx_merge1_2$ASBtf_POLR2ApS5_ref_perc>=0 & eqtl_ENTEx_merge1_2$ASBtf_POLR2ApS5_ref_perc<=1) & eqtl_ENTEx_merge1_2$GTEx != ".",]
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/ASBtf-)
+tbl = matrix(as.numeric(c(2031,422677,186,6822)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 4.876841e-140
+
+#chisq.test(nonReg/ASM+ vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(2031,422677,20,1044)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 1.857607e-10
+
+#chisq.test(Prom/ASM+/ASBtf- vs Prom/ASM+/oneASBtf)
+tbl = matrix(as.numeric(c(186,6822,20,1044)), ncol = 2, byrow = T)
+chisq.test(tbl)$p.value # sig p = 0.1650771
+
+
+category = c("nonReg/ASM+","Prom+/ASM+/ASBtf-","Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf")
+value = c(867,42,6,0)
+data <- data.frame(category,value)
+data$perc = c(867/424708,42/7008,6/1064,0/29)
+data$category <- factor(data$category, levels = c("nonReg/ASM+", "Prom+/ASM+/ASBtf-", "Prom+/ASM+/oneASBtf","Prom+/ASM+/allASBtf"))
+#data$sd = c(0.0001059552,0.001920091,0.004163534,0)
+
+
+ggplot(data, aes(y=perc, x=category,color=category, fill=category)) + 
+  geom_bar(position="dodge", stat="identity",width = 0.45,color="black") +
+  ylab("Fraction of eQTL ") +
+  scale_y_continuous(limits = c(0,0.01),expand = c(0, 0),breaks = seq(0,0.01,0.001)) +
+  theme(legend.title = element_blank()) +  
+  theme(legend.position = c(0.90, 0.90)) +
+  theme_bw() +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.1,0.2,0.1),"inch")) +
+  theme(legend.position = "none") #+
+#  geom_errorbar(aes(ymin=perc-sd, ymax=perc+sd), width=.2,
+#                 position=position_dodge(.9),color = "black") 
+
+
+ENTEx_combined_tmp = unique(ENTEx_combined)
+
+```
+
+```{r phasing (first 9 lines repeated for enc001, enc002, and enc003)}
+enc004_hetSnps = enc004_hetSnps[enc004_hetSnps$X1 != "chrX" & enc004_hetSnps$X1 != "chrY",]
+enc004_hetSnps$X1 = gsub("chr","",enc004_hetSnps$X1)
+enc004_hetSnps$X1 = as.numeric(as.character(enc004_hetSnps$X1))
+enc004_hetSnps$X2 = as.numeric(as.character(enc004_hetSnps$X2))
+
+
+enc004_hetSnps = enc004_hetSnps[order(enc004_hetSnps$X1,enc004_hetSnps$X2),]
+
+colnames(enc004_hetSnps) = c("chromosome","start","end","hetSNP_allele1","hetSNP_allele2","is_hetCpG")
+
+enc004_allmark = merge(enc004_allmark,enc004_hetSnps,by=c("chromosome","start","end"),all.x =T)
+
+
+enc004_allmark = enc004_allmark[order(enc004_allmark$chromosome,enc004_allmark$start),]
+
+enc004_allmark$sample = "enc004"
+
+
+ENTEx_combined_backup2 = rbind(enc001_allmark,enc002_allmark,enc003_allmark,enc004_allmark)
+
+
+ENTEx_combined$meth_diff_phased = ENTEx_combined$meth_diff
+
+ENTEx_combined$meth_diff_phased[ENTEx_combined$Allele1 == ENTEx_combined$hetSNP_allele2] = -ENTEx_combined$meth_diff_phased[ENTEx_combined$Allele1 == ENTEx_combined$hetSNP_allele2]
+
+ENTEx_combined2 = ENTEx_combined[,c(1:3,37,38,15,16,18,20,21,41,12,23:34,40)]
+
+```
+
+
+```{r final vignette used}
+ENTEx_combined = ENTEx_combined[,c(1:15,17,18,20,21,25:45)]
+
+gencc_genes = unique(gencc_submissions$gene_symbol)
+
+potential_vignette_records = ENTEx_combined2[ENTEx_combined2$refGene1 %in% gencc_genes,]
+
+potential_vignette_genes = unique(potential_vignette_records$refGene1) # 2097
+
+potential_vignette_records_ASM_upstream = potential_vignette_records[potential_vignette_records$FDR < 0.1 & potential_vignette_records$Func.refGene == "upstream" & abs(potential_vignette_records$meth_diff_phased > 0.1) & potential_vignette_records$reg_element == "PLS",]
+
+potential_vignette_genes = unique(potential_vignette_records_ASM_upstream$refGene1) # 118
+
+potential_vignette_records = potential_vignette_records[potential_vignette_records$refGene1 %in% potential_vignette_genes,]
+
+potential_vignette_records_ASE = potential_vignette_records[potential_vignette_records$ASE_ref_perc!= -1 &potential_vignette_records$ASE_ref_perc!= 2 & potential_vignette_records$Func.refGene %in% c("intronic","exonic") ,]
+
+potential_vignette_genes = unique(potential_vignette_records_ASE$refGene1) # 63
+
+potential_vignette_records = potential_vignette_records[potential_vignette_records$refGene1 %in% potential_vignette_genes,]
+
+potential_vignette_records = potential_vignette_records[potential_vignette_records$Func.refGene!="intergenic",]
+
+potential_vignette_records = unique(potential_vignette_records)
+
+potential_vignette_records$FDR = formatC(potential_vignette_records$FDR, format = "e", digits = 4)
+
+potential_vignette_genes_tmp = potential_vignette_records[potential_vignette_records$refGene1 == "DNAH11" & potential_vignette_records$Func.refGene %in% c("exonic","intronic","upstream","downstream"),]
+
+
+"DNAH11" %in% potential_vignette_genes # 21543039 gene start 21542401-21545000 genecard promoter AR
+"KCNMA1" %in% potential_vignette_genes 
+"PTPN11" %in% potential_vignette_genes # AD
+
+
+ASM_vignette = ENTEx_combined2[ENTEx_combined2$refGene1 == "DNAH11" & ENTEx_combined2$Func.refGene %in% c("exonic","intronic","upstream","downstream","UTR5","UTR3"),]
+ENC001_vignette = ASM_vignette[ASM_vignette$sample == "enc001",]
+ASM_ENC001_vignette = ENC001_vignette[ENC001_vignette$FDR < 0.1 & abs(ENC001_vignette$meth_diff_phased)>0.1,]
+ASM_ENC001_vignette$mark = "ASM"
+
+
+vignette_plot = ASM_ENC001_vignette[,c("end","meth_diff_phased","mark")]
+colnames(vignette_plot) = c("coord","allele1_allele2","epiMarker")
+
+
+ASE_ENC001_alltissues_vignette = ASE_ENC001_alltissues[ASE_ENC001_alltissues$X1 == 7 & ASE_ENC001_alltissues$X2>=21542401 & ASE_ENC001_alltissues$X2<=21901839,]
+ASE_ENC001_alltissues_vignette$X6[ASE_ENC001_alltissues_vignette$X3 == ASE_ENC001_alltissues_vignette$X5] = 1-ASE_ENC001_alltissues_vignette$X6[ASE_ENC001_alltissues_vignette$X3 == ASE_ENC001_alltissues_vignette$X5]
+ASE_ENC001_alltissues_vignette$perc_diff =ASE_ENC001_alltissues_vignette$X6-(1- ASE_ENC001_alltissues_vignette$X6)
+
+vignette_plot2_2 = ASE_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot2_2$epiMarker = "ASE"
+colnames(vignette_plot2_2) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot2)
+
+ATAC_ENC001_alltissues_vignette = ATAC_ENC001_alltissues[ATAC_ENC001_alltissues$X1 == 7 & ATAC_ENC001_alltissues$X2>=21542401 & ATAC_ENC001_alltissues$X2<=21901839,]
+ATAC_ENC001_alltissues_vignette$X6[ATAC_ENC001_alltissues_vignette$X3 == ATAC_ENC001_alltissues_vignette$X5] = 1-ATAC_ENC001_alltissues_vignette$X6[ATAC_ENC001_alltissues_vignette$X3 == ATAC_ENC001_alltissues_vignette$X5]
+ATAC_ENC001_alltissues_vignette$perc_diff =ATAC_ENC001_alltissues_vignette$X6-(1- ATAC_ENC001_alltissues_vignette$X6)
+
+vignette_plot3 = ATAC_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot3$epiMarker = "ATAC"
+colnames(vignette_plot3) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot3)
+
+ASBtf_CTCF_ENC001_alltissues_vignette = ASBtf_CTCF_ENC001_alltissues[ASBtf_CTCF_ENC001_alltissues$X1 == 7 & ASBtf_CTCF_ENC001_alltissues$X2>=21542401 & ASBtf_CTCF_ENC001_alltissues$X2<=21901839,]
+ASBtf_CTCF_ENC001_alltissues_vignette$X6[ASBtf_CTCF_ENC001_alltissues_vignette$X3 == ASBtf_CTCF_ENC001_alltissues_vignette$X5] = 1-ASBtf_CTCF_ENC001_alltissues_vignette$X6[ASBtf_CTCF_ENC001_alltissues_vignette$X3 == ASBtf_CTCF_ENC001_alltissues_vignette$X5]
+ASBtf_CTCF_ENC001_alltissues_vignette$perc_diff = ASBtf_CTCF_ENC001_alltissues_vignette$X6-(1- ASBtf_CTCF_ENC001_alltissues_vignette$X6)
+
+vignette_plot5 = ASBtf_CTCF_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot5$epiMarker = "ASBtf_CTCF"
+colnames(vignette_plot5) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot5)
+
+
+ASBtf_POLR2A_ENC001_alltissues_vignette = ASBtf_POLR2A_ENC001_alltissues[ASBtf_POLR2A_ENC001_alltissues$X1 == 7 & ASBtf_POLR2A_ENC001_alltissues$X2>=21542401 & ASBtf_POLR2A_ENC001_alltissues$X2<=21901839,]
+ASBtf_POLR2A_ENC001_alltissues_vignette$X6[ASBtf_POLR2A_ENC001_alltissues_vignette$X3 == ASBtf_POLR2A_ENC001_alltissues_vignette$X5] = 1-ASBtf_POLR2A_ENC001_alltissues_vignette$X6[ASBtf_POLR2A_ENC001_alltissues_vignette$X3 == ASBtf_POLR2A_ENC001_alltissues_vignette$X5]
+ASBtf_POLR2A_ENC001_alltissues_vignette$perc_diff =ASBtf_POLR2A_ENC001_alltissues_vignette$X6-(1- ASBtf_POLR2A_ENC001_alltissues_vignette$X6)
+
+
+vignette_plot4 = ASBtf_POLR2A_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot4$epiMarker = "ASBtf_POLR2A"
+colnames(vignette_plot4) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot4)
+
+
+ASBtf_POLR2ApS5_ENC001_alltissues_vignette = ASBtf_POLR2ApS5_ENC001_alltissues[ASBtf_POLR2ApS5_ENC001_alltissues$X1 == 7 & ASBtf_POLR2ApS5_ENC001_alltissues$X2>=21542401 & ASBtf_POLR2ApS5_ENC001_alltissues$X2<=21901839,]
+ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X6[ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X3 == ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X5] = 1-ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X6[ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X3 == ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X5]
+ASBtf_POLR2ApS5_ENC001_alltissues_vignette$perc_diff =ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X6-(1- ASBtf_POLR2ApS5_ENC001_alltissues_vignette$X6)
+
+vignette_plot6 = ASBtf_POLR2ApS5_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot6$epiMarker = "ASBtf_POLR2ApS5"
+colnames(vignette_plot6) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot6)
+
+ASBtf_EP300_ENC001_alltissues_vignette = ASBtf_EP300_ENC001_alltissues[ASBtf_EP300_ENC001_alltissues$X1 == 7 & ASBtf_EP300_ENC001_alltissues$X2>=21542401 & ASBtf_EP300_ENC001_alltissues$X2<=21901839,]
+ASBtf_EP300_ENC001_alltissues_vignette$X6[ASBtf_EP300_ENC001_alltissues_vignette$X3 == ASBtf_EP300_ENC001_alltissues_vignette$X5] = 1-ASBtf_EP300_ENC001_alltissues_vignette$X6[ASBtf_EP300_ENC001_alltissues_vignette$X3 == ASBtf_EP300_ENC001_alltissues_vignette$X5]
+ASBtf_EP300_ENC001_alltissues_vignette$perc_diff =ASBtf_EP300_ENC001_alltissues_vignette$X6-(1- ASBtf_EP300_ENC001_alltissues_vignette$X6)
+
+vignette_plot7 = ASBtf_EP300_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot7$epiMarker = "ASBtf_EP300"
+colnames(vignette_plot7) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot7)
+
+
+
+ASBh_H3K27ac_ENC001_alltissues_vignette = ASBhistone_H3K27ac_ENC001_alltissues[ASBhistone_H3K27ac_ENC001_alltissues$X1 == 7 & ASBhistone_H3K27ac_ENC001_alltissues$X2>=21542401 & ASBhistone_H3K27ac_ENC001_alltissues$X2<=21901839,]
+ASBh_H3K27ac_ENC001_alltissues_vignette$X6[ASBh_H3K27ac_ENC001_alltissues_vignette$X3 == ASBh_H3K27ac_ENC001_alltissues_vignette$X5] = 1-ASBh_H3K27ac_ENC001_alltissues_vignette$X6[ASBh_H3K27ac_ENC001_alltissues_vignette$X3 == ASBh_H3K27ac_ENC001_alltissues_vignette$X5]
+ASBh_H3K27ac_ENC001_alltissues_vignette$perc_diff =ASBh_H3K27ac_ENC001_alltissues_vignette$X6-(1- ASBh_H3K27ac_ENC001_alltissues_vignette$X6)
+
+vignette_plot8 = ASBh_H3K27ac_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot8$epiMarker = "ASBh_H3K27ac"
+colnames(vignette_plot8) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot8)
+
+ASBh_H3K27me3_ENC001_alltissues_vignette = ASBhistone_H3K27me3_ENC001_alltissues[ASBhistone_H3K27me3_ENC001_alltissues$X1 == 7 & ASBhistone_H3K27me3_ENC001_alltissues$X2>=21542401 & ASBhistone_H3K27me3_ENC001_alltissues$X2<=21901839,]
+ASBh_H3K27me3_ENC001_alltissues_vignette$X6[ASBh_H3K27me3_ENC001_alltissues_vignette$X3 == ASBh_H3K27me3_ENC001_alltissues_vignette$X5] = 1-ASBh_H3K27me3_ENC001_alltissues_vignette$X6[ASBh_H3K27me3_ENC001_alltissues_vignette$X3 == ASBh_H3K27me3_ENC001_alltissues_vignette$X5]
+ASBh_H3K27me3_ENC001_alltissues_vignette$perc_diff =ASBh_H3K27me3_ENC001_alltissues_vignette$X6-(1- ASBh_H3K27me3_ENC001_alltissues_vignette$X6)
+
+vignette_plot9 = ASBh_H3K27me3_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot9$epiMarker = "ASBh_H3K27me3"
+colnames(vignette_plot9) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot9)
+
+ASBh_H3K36me3_ENC001_alltissues_vignette = ASBhistone_H3K36me3_ENC001_alltissues[ASBhistone_H3K36me3_ENC001_alltissues$X1 == 7 & ASBhistone_H3K36me3_ENC001_alltissues$X2>=21542401 & ASBhistone_H3K36me3_ENC001_alltissues$X2<=21901839,]
+ASBh_H3K36me3_ENC001_alltissues_vignette$X6[ASBh_H3K36me3_ENC001_alltissues_vignette$X3 == ASBh_H3K36me3_ENC001_alltissues_vignette$X5] = 1-ASBh_H3K36me3_ENC001_alltissues_vignette$X6[ASBh_H3K36me3_ENC001_alltissues_vignette$X3 == ASBh_H3K36me3_ENC001_alltissues_vignette$X5]
+ASBh_H3K36me3_ENC001_alltissues_vignette$perc_diff =ASBh_H3K36me3_ENC001_alltissues_vignette$X6-(1- ASBh_H3K36me3_ENC001_alltissues_vignette$X6)
+
+vignette_plot10 = ASBh_H3K36me3_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot10$epiMarker = "ASBh_H3K36me3"
+colnames(vignette_plot10) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot10)
+
+
+ASBh_H3K4me1_ENC001_alltissues_vignette = ASBhistone_H3K4me1_ENC001_alltissues[ASBhistone_H3K4me1_ENC001_alltissues$X1 == 7 & ASBhistone_H3K4me1_ENC001_alltissues$X2>=21542401 & ASBhistone_H3K4me1_ENC001_alltissues$X2<=21901839,]
+ASBh_H3K4me1_ENC001_alltissues_vignette$X6[ASBh_H3K4me1_ENC001_alltissues_vignette$X3 == ASBh_H3K4me1_ENC001_alltissues_vignette$X5] = 1-ASBh_H3K4me1_ENC001_alltissues_vignette$X6[ASBh_H3K4me1_ENC001_alltissues_vignette$X3 == ASBh_H3K4me1_ENC001_alltissues_vignette$X5]
+ASBh_H3K4me1_ENC001_alltissues_vignette$perc_diff =ASBh_H3K4me1_ENC001_alltissues_vignette$X6-(1- ASBh_H3K4me1_ENC001_alltissues_vignette$X6)
+
+vignette_plot11 = ASBh_H3K4me1_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot11$epiMarker = "H3K4me1"
+colnames(vignette_plot11) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot11)
+vignette_plot$epiMarker[vignette_plot$epiMarker == "H3K4me1"] = "ASBh_H3K4me1"
+
+ASBh_H3K4me3_ENC001_alltissues_vignette = ASBhistone_H3K4me3_ENC001_alltissues[ASBhistone_H3K4me3_ENC001_alltissues$X1 == 7 & ASBhistone_H3K4me3_ENC001_alltissues$X2>=21542401 & ASBhistone_H3K4me3_ENC001_alltissues$X2<=21901839,]
+ASBh_H3K4me3_ENC001_alltissues_vignette$X6[ASBh_H3K4me3_ENC001_alltissues_vignette$X3 == ASBh_H3K4me3_ENC001_alltissues_vignette$X5] = 1-ASBh_H3K4me3_ENC001_alltissues_vignette$X6[ASBh_H3K4me3_ENC001_alltissues_vignette$X3 == ASBh_H3K4me3_ENC001_alltissues_vignette$X5]
+ASBh_H3K4me3_ENC001_alltissues_vignette$perc_diff =ASBh_H3K4me3_ENC001_alltissues_vignette$X6-(1- ASBh_H3K4me3_ENC001_alltissues_vignette$X6)
+
+vignette_plot12 = ASBh_H3K4me3_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot12$epiMarker = "ASBh_H3K4me3"
+colnames(vignette_plot12) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot12)
+
+
+ASBh_H3K9me3_ENC001_alltissues_vignette = ASBhistone_H3K9me3_ENC001_alltissues[ASBhistone_H3K9me3_ENC001_alltissues$X1 == 7 & ASBhistone_H3K9me3_ENC001_alltissues$X2>=21542401 & ASBhistone_H3K9me3_ENC001_alltissues$X2<=21901839,]
+ASBh_H3K9me3_ENC001_alltissues_vignette$X6[ASBh_H3K9me3_ENC001_alltissues_vignette$X3 == ASBh_H3K9me3_ENC001_alltissues_vignette$X5] = 1-ASBh_H3K9me3_ENC001_alltissues_vignette$X6[ASBh_H3K9me3_ENC001_alltissues_vignette$X3 == ASBh_H3K9me3_ENC001_alltissues_vignette$X5]
+ASBh_H3K9me3_ENC001_alltissues_vignette$perc_diff =ASBh_H3K9me3_ENC001_alltissues_vignette$X6-(1- ASBh_H3K9me3_ENC001_alltissues_vignette$X6)
+
+vignette_plot13 = ASBh_H3K9me3_ENC001_alltissues_vignette[,c(2,7)]
+vignette_plot13$epiMarker = "ASBh_H3K9me3"
+colnames(vignette_plot13) = c("coord","allele1_allele2","epiMarker")
+vignette_plot = rbind(vignette_plot,vignette_plot13)
+
+
+# eQTL
+library("tidyr")
+
+DNAH11_eQTL_GTEx = separate(data = DNAH11_eQTL_GTEx, col = "Variant Id", into = c("chr","end","ref","alt","ver"),sep = "_")
+
+DNAH11_eQTL_GTEx = DNAH11_eQTL_GTEx[DNAH11_eQTL_GTEx$ref %in% c("A","T","C","G") & DNAH11_eQTL_GTEx$alt %in% c("A","T","C","G") & DNAH11_eQTL_GTEx$chr != "X" & DNAH11_eQTL_GTEx$chr != "Y" ,]
+
+DNAH11_eQTL_GTEx$chr = gsub("chr","",DNAH11_eQTL_GTEx$chr)
+
+DNAH11_eQTL_GTEx$chr = as.numeric(as.character(DNAH11_eQTL_GTEx$chr))
+DNAH11_eQTL_GTEx = DNAH11_eQTL_GTEx[,3:6]
+
+DNAH11_eQTL_GTEx = unique(DNAH11_eQTL_GTEx)
+
+
+
+DNAH11_eQTL_GTEx = merge(ENTEx_combined,eqtl_tissue_set_metasoft[,c(1:4,6)],by.x =c("chromosome","end","ref","alt"),by.y = c("chr","end","ref","alt"),all.x = T)
+
+eqtl_ENTEx_merge = eqtl_ENTEx_merge[!is.na(eqtl_ENTEx_merge$chromosome),]
+
+eqtl_ENTEx_merge$PVALUE_Q[is.na(eqtl_ENTEx_merge$PVALUE_Q)] = 2
+
+
+
+
+library(ggplot2)
+library(RColorBrewer)
+
+vignette_plot2 = vignette_plot[vignette_plot$epiMarker!="ASBh_H3K27me3",]
+colnames(vignette_plot2) = c("coord","allele1_allele2","AllelicEvent")
+
+
+# Plotting
+full_gene = ggplot(vignette_plot2, aes(y=allele1_allele2, x=coord,color=AllelicEvent,fill=AllelicEvent)) + 
+  geom_point() +
+  ylab("Allele1 - Allele2 (%)") +
+  scale_x_continuous(limits = c(21542400,21901839),expand = c(0, 0),breaks = seq(21542400,21901839,50000)) +
+  scale_y_continuous(limits = c(-1.1,1.1),expand = c(0, 0),breaks = seq(-1.1,1.1,0.1)) +
+  theme(legend.title = element_blank()) +  
+  theme_bw() +
+  theme(legend.position = "top") +
+#  theme(axis.title.x=element_blank(),
+#        axis.text.x=element_blank(),
+#        axis.ticks.x=element_blank(),
+#        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.3,0.2,0.3),"inch")) +
+  scale_colour_brewer(palette = "Set3") +
+  geom_hline(yintercept=0, linetype="solid", color = "black", size=1.5) +
+  geom_vline(xintercept=21772000, linetype="solid", color = "black", size=1.5) +
+  geom_rect(aes(xmin = 21542401,
+                xmax = 21543038,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "red", size = 1.5)
+  
+ggsave(filename="full_gene_overview.png", plot=full_gene, device="png",dpi=1000)
+
+
+#DNAH11 21543039 gene start 21542401-21545000 genecard promoter AR
+
+
+
+part_gene = ggplot(vignette_plot2, aes(y=allele1_allele2, x=coord,color=AllelicEvent,fill=AllelicEvent)) + 
+  geom_point() +
+  ylab("Allele1 - Allele2 (%)") +
+  scale_x_continuous(limits = c(21542400,21642400),expand = c(0, 0),breaks = seq(21542400,21642400,20000)) +
+  scale_y_continuous(limits = c(-1.0,0.3),expand = c(0, 0),breaks = seq(-1.0,0.3,0.1)) +
+  theme(legend.title = element_blank()) +  
+  theme_bw() +
+  theme(legend.position = "top") +
+#  theme(axis.title.x=element_blank(),
+#        axis.text.x=element_blank(),
+#        axis.ticks.x=element_blank(),
+#        axis.title.y=element_text(size=18),axis.text.y=element_text(size=16)) +
+  theme(plot.margin=unit(c(0.2,0.3,0.2,0.3),"inch")) +
+  scale_colour_brewer(palette = "Set3") +
+  geom_hline(yintercept=0, linetype="solid", color = "black", size=1.5) +
+  geom_rect(aes(xmin = 21542401,
+                xmax = 21543038,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "red", size = 1.5) +
+  geom_rect(aes(xmin = 21543039,
+                xmax = 21543596,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21545006,
+                xmax = 21545149,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21558802,
+                xmax = 21558998,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21559603,
+                xmax = 21559792,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21561071,
+                xmax = 21561170,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21564186,
+                xmax = 21564397,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21570069,
+                xmax = 21570299,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21571806,
+                xmax = 21571973,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21581905,
+                xmax = 21582021,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21588064,
+                xmax = 21588201,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21588512,
+                xmax = 21588636,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21589208,
+                xmax = 21589403,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21590918,
+                xmax = 21591022,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21591185,
+                xmax = 21591577,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21599787,
+                xmax = 21600119,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21600676,
+                xmax = 21600930,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21601010,
+                xmax = 21601179,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21601396,
+                xmax = 21601618,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21606426,
+                xmax = 21606542,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21606647,
+                xmax = 21606733,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21615114,
+                xmax = 21615272,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21616209,
+                xmax = 21616292,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21617619,
+                xmax = 21617777,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21619100,
+                xmax = 21619222,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21619956,
+                xmax = 21620078,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21635871,
+                xmax = 21636095,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21637611,
+                xmax = 21637702,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21638939,
+                xmax = 21639065,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "blue", size = 1.5) +
+  geom_rect(aes(xmin = 21551000,
+                xmax = 21552201,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "green", size = 1.5) +
+  geom_rect(aes(xmin = 21616601,
+                xmax = 21619399,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "green", size = 1.5) +
+  geom_rect(aes(xmin = 21579828,
+                xmax = 21580965,
+                ymin = -0.05,
+                ymax = 0.05),
+            fill = "transparent", color = "green", size = 1.5) +
+  coord_cartesian(xlim =c(21542400, 21545400))
+ggsave(filename="part_gene_overview.zoom.png", plot=part_gene, device="png",dpi=1000)
+
+
+
+
+
+# Table formatting - highlight calls
+ASM_vignette_enc001$ASE_ref_perc[ASM_vignette_enc001$ASE_ref_perc == -1 | ASM_vignette_enc001$ASE_ref_perc == 2] = "."
+ASM_vignette_enc001$ATAC_ref_perc [ASM_vignette_enc001$ATAC_ref_perc == -1 | ASM_vignette_enc001$ATAC_ref_perc == 2] = "."
+ASM_vignette_enc001$ASE_ref_perc[ASM_vignette_enc001$ASE_ref_perc == -1 | ASM_vignette_enc001$ASE_ref_perc == 2] = "."
+ 
+ASM_vignette_enc001$ATAC_ref_perc [ASM_vignette_enc001$ATAC_ref_perc == -1 | ASM_vignette_enc001$ATAC_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBtf_CTCF_ref_perc [ASM_vignette_enc001$ASBtf_CTCF_ref_perc == -1 | ASM_vignette_enc001$ASBtf_CTCF_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBtf_EP300_ref_perc [ASM_vignette_enc001$ASBtf_EP300_ref_perc == -1 | ASM_vignette_enc001$ASBtf_EP300_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBtf_POLR2A_ref_perc [ASM_vignette_enc001$ASBtf_POLR2A_ref_perc == -1 | ASM_vignette_enc001$ASBtf_POLR2A_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBtf_POLR2ApS5_ref_perc [ASM_vignette_enc001$ASBtf_POLR2ApS5_ref_perc == -1 | ASM_vignette_enc001$ASBtf_POLR2ApS5_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBh_H3K27ac_ref_perc [ASM_vignette_enc001$ASBh_H3K27ac_ref_perc == -1 | ASM_vignette_enc001$ASBh_H3K27ac_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBh_H3K27me3_ref_perc [ASM_vignette_enc001$ASBh_H3K27me3_ref_perc == -1 | ASM_vignette_enc001$ASBh_H3K27me3_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBh_H3K36me3_ref_perc [ASM_vignette_enc001$ASBh_H3K36me3_ref_perc == -1 | ASM_vignette_enc001$ASBh_H3K36me3_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBh_H3K4me1_ref_perc [ASM_vignette_enc001$ASBh_H3K4me1_ref_perc == -1 | ASM_vignette_enc001$ASBh_H3K4me1_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBh_H3K4me3_ref_perc [ASM_vignette_enc001$ASBh_H3K4me3_ref_perc == -1 | ASM_vignette_enc001$ASBh_H3K4me3_ref_perc == 2] = "."
+ASM_vignette_enc001$ASBh_H3K9me3_ref_perc [ASM_vignette_enc001$ASBh_H3K9me3_ref_perc == -1 | ASM_vignette_enc001$ASBh_H3K9me3_ref_perc == 2] = "."
+```
+
+
+
+
+
